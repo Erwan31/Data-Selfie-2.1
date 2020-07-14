@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Data Selfie App</title>
 </head>
 <body>
-    <h1>Hello there</h1>
+    <h1>Data Selfie Stuff</h1>
+
+    <p> Latitude: <span id="latitude"></span>º<br>
+        Longitude:  <span id="longitude"></span>º</p>
+
+    <script>
+        if('geolocation' in navigator) {
+            /* geolocation is available */
+            console.log('geolocation available');
+            navigator.geolocation.getCurrentPosition((position) => {
+            console.log(position.coords.latitude, position.coords.longitude);
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            document.getElementById('latitude').textContent = lat;
+            document.getElementById('longitude').textContent = lon;
+
+            });
+        } else {
+            /* geolocation IS NOT available */
+            console.log('geolocation not available');
+        }
+    </script>
 </body>
 </html>
