@@ -32,7 +32,7 @@
 
     <script>
 
-const mymap = L.map('myMap').setView([0, 0], 17);
+    const mymap = L.map('myMap').setView([0, 0], 17);
     const attribution =  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
     const tileURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const tiles = L.tileLayer( tileURL, { attribution });
@@ -52,29 +52,31 @@ const mymap = L.map('myMap').setView([0, 0], 17);
         if('geolocation' in navigator) {
             /* geolocation is available */
             console.log('geolocation available');
-            navigator.geolocation.getCurrentPosition((position) => {
-            console.log(position.coords.latitude, position.coords.longitude);
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+            navigator.geolocation.getCurrentPosition( async (position) => {
+                console.log(position.coords.latitude, position.coords.longitude);
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
 
-            document.getElementById('latitude').textContent = lat;
-            document.getElementById('longitude').textContent = lon;
+                document.getElementById('latitude').textContent = lat;
+                document.getElementById('longitude').textContent = lon;
 
-            marker.setLatLng([lat, lon]);
-            mymap.setView([lat, lon]);
+                marker.setLatLng([lat, lon]);
+                mymap.setView([lat, lon]);
 
-            const data = { lat, lon };
-            const options = {
-                method:'POST',
-                body: JSON.stringify(data),
-                headers: {"Content-Type": "application/json"},
-            };
-            fetch('/api', options).then( response =>
-             console.log(response));
+                const data = { lat, lon };
+                const options = {
+                    method:'POST',
+                    body: JSON.stringify(data),
+                    headers: {"Content-Type": "application/json"},
+                };
+            
+                const response = await fetch('/api', options);
+                const json = await response.json();
 
-
+                console.log(json); 
             });
-        } else {
+        } 
+        else {
             /* geolocation IS NOT available */
             console.log('geolocation not available');
         }
