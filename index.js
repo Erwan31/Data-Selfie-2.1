@@ -14,7 +14,7 @@ app.post('/api', (request, response) => {
     const data = request.body;
 
     // Store data locally
-    const rec = [data.lat, data.lon];
+    const database = [data.lat, data.lon];
     // Save into a file with timestamp
     const currentDate = new Date();
     const date = currentDate.getDate();
@@ -28,7 +28,7 @@ app.post('/api', (request, response) => {
     });
  
     // Keep the position
-   record.push( stringFile.concat(currentDate,",", rec, "\r\n") ); 
+    record.push( stringFile.concat(currentDate,",",database, "\r\n") ); 
  
    // See the recorded values inside the server console
     console.log('record', record);
