@@ -15,8 +15,6 @@ let record = [];
 // Create database file
 const database = new Datastore('database.db');
 database.loadDatabase();
-database.insert({ name: 'Whatever', status:"rainbow"});
-database.insert({ name: 'Whoareyou', status:"stuff"});
 
 app.listen(3000, () => console.log('listening at 3000'));
 app.use(express.static('public'));
@@ -27,7 +25,7 @@ app.post('/api', (request, response) => {
     const data = request.body;
 
     // Store data locally
-    const database = [data.lat, data.lon];
+    const datafile = [data.lat, data.lon];
     // Save into a file with timestamp
     const currentDate = new Date();
     const date = currentDate.getDate();
@@ -41,7 +39,7 @@ app.post('/api', (request, response) => {
     });
  
     // Keep the position
-    record.push( stringFile.concat(currentDate,",",database, "\r\n") ); 
+    record.push( stringFile.concat(Date.now(),",", datafile, "\r\n") ); 
  
    // See the recorded values inside the server console
     console.log('record', record);
@@ -52,6 +50,9 @@ app.post('/api', (request, response) => {
         }
         console.log("The file was saved!");
     }); 
+
+    const timestamp = Date.now();
+    database.insert({datafile, timestamp});
 }); 
 
 
