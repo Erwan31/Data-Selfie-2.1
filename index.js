@@ -1,9 +1,22 @@
+
+// Include express server
 const express = require('express');
 const app = express();
 
+// Include file system
 const fs = require('fs');
 
+// Include NeDB database
+const Datastore = require('nedb');
+
+
 let record = [];
+
+// Create database file
+const database = new Datastore('database.db');
+database.loadDatabase();
+database.insert({ name: 'Whatever', status:"rainbow"});
+database.insert({ name: 'Whoareyou', status:"stuff"});
 
 app.listen(3000, () => console.log('listening at 3000'));
 app.use(express.static('public'));
