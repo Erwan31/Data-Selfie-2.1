@@ -63,6 +63,16 @@ const mymap = L.map('myMap').setView([0, 0], 17);
             marker.setLatLng([lat, lon]);
             mymap.setView([lat, lon]);
 
+            const data = { lat, lon };
+            const options = {
+                method:'POST',
+                body: JSON.stringify(data),
+                headers: {"Content-Type": "application/json"},
+            };
+            fetch('/api', options).then( response =>
+             console.log(response));
+
+
             });
         } else {
             /* geolocation IS NOT available */
