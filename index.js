@@ -25,7 +25,7 @@ app.post('/api', (request, response) => {
     const data = request.body;
 
     // Store data locally
-    const datafile = [data.lat, data.lon];
+    const datafile = [data.lat, data.lon, data.veggie];
     // Save into a file with timestamp
     const currentDate = new Date();
     const date = currentDate.getDate();
@@ -36,6 +36,7 @@ app.post('/api', (request, response) => {
         status: 'success',
         latitude: request.lat,
         longitude: request.lon,
+        veggie: request.veggie,
     });
  
     // Keep the position
@@ -44,6 +45,7 @@ app.post('/api', (request, response) => {
    // See the recorded values inside the server console
     console.log('record', record);
 
+    // File sytem saving
     fs.appendFile("/test.txt", record, function(err) {
         if(err) {
             return console.log(err);
