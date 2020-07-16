@@ -54,7 +54,16 @@ app.post('/api', (request, response) => {
     }); 
 
     const timestamp = Date.now();
-    database.insert({datafile, timestamp});
+    database.insert({latitude, longitude, veggie, timestamp});
 }); 
 
-
+// 2.5
+app.get('/api', (request, response) => {
+    database.find({}, (err, data) => {
+        if(err){
+            response.end();
+            return;
+        }
+        response.json(data);
+    });
+})
