@@ -15,6 +15,8 @@
     integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
     crossorigin=""></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+
     <title>Data Selfie App</title>
 </head>
 <style>
@@ -38,8 +40,17 @@
 
     <script>
 
-    async function submitLocation( lat, lon, veggie){
-            const data = { lat, lon, veggie };
+    function setup(){
+
+        /* Get Webcam image */
+        noCanvas();
+
+        const video = createCapture(VIDEO);
+        video.size(320, 240);
+
+        /* Location */
+        async function submitLocation( lat, lon, veggie, image){
+            const data = { lat, lon, veggie, image };
             console.log('data send to server', data);
             const options = {
                 method:'POST',
@@ -51,79 +62,84 @@
             const json = await response.json();
 
             console.log('location submitted', json); 
+        }
+
+        const mymap = L.map('myMap').setView([0, 0], 17);
+        const attribution =  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        const tileURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer( tileURL, { attribution });
+        var myIcon = L.icon({
+                            iconUrl: 'International_Space_Station.svg',
+                            iconSize: [38, 95],
+                            iconAnchor: [22, 94],
+                            popupAnchor: [-3, -76],
+                            shadowUrl: 'my-icon-shadow.png',
+                            shadowSize: [68, 95],
+                            shadowAnchor: [22, 94]
+                        });
+        const marker = L.marker([0, 0], {icon: myIcon}).addTo(mymap);
+
+        tiles.addTo(mymap);
+
+        let lat = 0, lon = 0;
+        
+        if('geolocation' in navigator) {
+            /* geolocation is available */
+            console.log('geolocation available');
+            navigator.geolocation.getCurrentPosition( async (position) => {
+                console.log(position.coords.latitude, position.coords.longitude);
+                lat = position.coords.latitude;
+                lon = position.coords.longitude;
+
+                document.getElementById('latitude').textContent = lat;
+                document.getElementById('longitude').textContent = lon;
+
+                marker.setLatLng([lat, lon]);
+                mymap.setView([lat, lon]);
+            });
+        } 
+        else {
+            /* geolocation IS NOT available */
+            console.log('geolocation not available');
+        }
+
+        const buttonSubmit = document.getElementById("submit");
+        buttonSubmit.addEventListener('click', () =>{
+            video.loadPixels();
+            const image64 = video.canvas.toDataURL();
+            console.log('click');
+            const veggie = document.getElementById("veggie").value;
+            console.log(veggie);
+            submitLocation( lat, lon, veggie, image64);
+        });
+
+
+        // 2.5 -> Querying DB
+        getData();
+
+        async function getData() {
+            const response = await fetch('/api');
+            const data = await response.json();
+            console.log('getdata ', data);
+
+            data.forEach( item => {
+                const date = document.createElement('div');
+                const root = document.createElement('div');
+                const geo = document.createElement('div');
+                const mood = document.createElement('div');
+                const dateString = new Date(item.timestamp).toLocaleTimeString();
+
+                mood.textContent = `mood: ${item.veggie}`;
+                geo.textContent = `lat: ${item.lat}, lon: ${item.lon}`;
+                date.textContent = dateString;
+
+                root.append( mood, geo, date);
+                document.body.append(root);
+            });
+        }
     }
 
-    const mymap = L.map('myMap').setView([0, 0], 17);
-    const attribution =  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-    const tileURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    const tiles = L.tileLayer( tileURL, { attribution });
-    var myIcon = L.icon({
-                        iconUrl: 'International_Space_Station.svg',
-                        iconSize: [38, 95],
-                        iconAnchor: [22, 94],
-                        popupAnchor: [-3, -76],
-                        shadowUrl: 'my-icon-shadow.png',
-                        shadowSize: [68, 95],
-                        shadowAnchor: [22, 94]
-                    });
-    const marker = L.marker([0, 0], {icon: myIcon}).addTo(mymap);
-
-    tiles.addTo(mymap);
-
-    let lat = 0, lon = 0;
     
-    if('geolocation' in navigator) {
-        /* geolocation is available */
-        console.log('geolocation available');
-        navigator.geolocation.getCurrentPosition( async (position) => {
-            console.log(position.coords.latitude, position.coords.longitude);
-            lat = position.coords.latitude;
-            lon = position.coords.longitude;
-
-            document.getElementById('latitude').textContent = lat;
-            document.getElementById('longitude').textContent = lon;
-
-            marker.setLatLng([lat, lon]);
-            mymap.setView([lat, lon]);
-        });
-    } 
-    else {
-        /* geolocation IS NOT available */
-        console.log('geolocation not available');
-    }
-
-    const buttonSubmit = document.getElementById("submit");
-    buttonSubmit.addEventListener('click', () =>{
-        console.log('click');
-        const veggie = document.getElementById("veggie").value;
-        console.log(veggie);
-        submitLocation( lat, lon, veggie)
-    });
-
-
-    // 2.5 -> Querying DB
-    getData();
-
-    async function getData() {
-        const response = await fetch('/api');
-        const data = await response.json();
-        console.log('getdata ', data);
-
-        data.forEach( item => {
-            const date = document.createElement('div');
-            const root = document.createElement('div');
-            const geo = document.createElement('div');
-            const mood = document.createElement('div');
-            const dateString = new Date(item.timestamp).toLocaleTimeString();
-
-            mood.textContent = `mood: ${item.veggie}`;
-            geo.textContent = `lat: ${item.lat}, lon: ${item.lon}`;
-            date.textContent = dateString;
-
-            root.append( mood, geo, date);
-            document.body.append(root);
-        });
-    }
 
     </script>
 </body>
