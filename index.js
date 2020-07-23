@@ -24,21 +24,16 @@ app.post('/api', (request, response) => {
     console.log('I have a request ');
     const data = request.body;
 
+    /*
     // Store data locally
     const datafile = [data.lat, data.lon, data.veggie];
     // Save into a file with timestamp
     const currentDate = new Date();
     const date = currentDate.getDate();
     const stringFile = "";
-    
-    // Display an answer onto the client
-    response.json({
-        status: 'success',
-        latitude: request.lat,
-        longitude: request.lon,
-        veggie: request.veggie,
-    });
+    */
  
+    /*
     // Keep the position
     record.push( stringFile.concat(Date.now(),",", datafile, "\r\n") ); 
  
@@ -52,9 +47,13 @@ app.post('/api', (request, response) => {
         }
         console.log("The file was saved!");
     }); 
-
+    */
+    
     const timestamp = Date.now();
-    database.insert({latitude, longitude, veggie, timestamp});
+    data.timestamp = timestamp;
+    database.insert(data);
+    // Display an answer onto the client
+    response.json(data);
 }); 
 
 // 2.5
