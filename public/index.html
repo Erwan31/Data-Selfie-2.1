@@ -123,17 +123,21 @@
             console.log('getdata ', data);
 
             data.forEach( item => {
+                const paragraph = document.createElement('p');
                 const date = document.createElement('div');
                 const root = document.createElement('div');
                 const geo = document.createElement('div');
                 const mood = document.createElement('div');
+                const image = document.createElement('img');
+
                 const dateString = new Date(item.timestamp).toLocaleTimeString();
 
                 mood.textContent = `mood: ${item.veggie}`;
                 geo.textContent = `lat: ${item.lat}, lon: ${item.lon}`;
                 date.textContent = dateString;
+                image.src = item.image;
 
-                root.append( mood, geo, date);
+                root.append( paragraph, mood, geo, date, image);
                 document.body.append(root);
             });
         }
